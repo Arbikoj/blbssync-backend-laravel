@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\LessonController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
@@ -26,3 +27,4 @@ Route::apiResource('/teachers', TeacherController::class);
 Route::apiResource('/majors', MajorController::class);
 Route::apiResource('/subjects', SubjectController::class);
 Route::apiResource('/groups', GroupController::class);
+Route::apiResource('/lessons', LessonController::class);
