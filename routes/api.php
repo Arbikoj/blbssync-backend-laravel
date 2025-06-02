@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\MajorController;
 use App\Http\Controllers\TeacherController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -20,3 +21,4 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/users', [UserController::class, 'store']);
 
 Route::apiResource('/teachers', TeacherController::class);
+Route::apiResource('/majors', MajorController::class);
