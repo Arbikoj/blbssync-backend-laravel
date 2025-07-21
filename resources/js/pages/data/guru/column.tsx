@@ -11,6 +11,7 @@ export const columns: ColumnDef<Teacher>[] = [
         id: 'rowNumber',
         header: '#',
         cell: ({ row }) => row.index + 1,
+        size: 40,
     },
     {
         accessorKey: 'name',

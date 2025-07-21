@@ -12,9 +12,11 @@ class TeacherController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $teachers = Teacher::all();
+        $perPage = $request->get('per_page', 10);
+        $teachers = Teacher::paginate($perPage);
+
         return new TeacherResource(true, 'List Data Teachers', $teachers);
     }
 

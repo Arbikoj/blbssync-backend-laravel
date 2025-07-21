@@ -9,7 +9,9 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import axios from 'axios';
+import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface DeleteDialogProps {
@@ -32,7 +34,11 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({ teacherId, teacherNa
 
     return (
         <AlertDialog>
-            <AlertDialogTrigger className="text-red-600 hover:underline">Hapus</AlertDialogTrigger>
+            <AlertDialogTrigger asChild>
+                <Button variant="secondary" size="icon" className="text-red-600 hover:text-red-700">
+                    <Trash2 className="h-4 w-4" />
+                </Button>
+            </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
