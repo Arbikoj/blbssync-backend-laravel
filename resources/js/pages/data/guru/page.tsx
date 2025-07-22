@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { SortingState } from '@tanstack/react-table';
 import axios from 'axios';
 import { Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -25,6 +26,8 @@ const PageGuru = () => {
     const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
     const [editData, setEditData] = useState<GuruFormData | undefined>(undefined);
 
+    const [sorting, setSorting] = useState<SortingState>([]);
+
     const fetchData = () => {
         setLoading(true);
         axios
@@ -32,6 +35,8 @@ const PageGuru = () => {
                 params: {
                     page: pagination.pageIndex + 1,
                     per_page: pagination.pageSize,
+                    sort_by: sorting[0]?.id,
+                    sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
                 },
             })
             .then((res) => {
@@ -45,7 +50,7 @@ const PageGuru = () => {
 
     useEffect(() => {
         fetchData();
-    }, [pagination]);
+    }, [pagination, sorting]);
 
     const handleAdd = () => {
         setModalMode('add');
@@ -111,6 +116,8 @@ const PageGuru = () => {
                 pagination={pagination}
                 onPaginationChange={setPagination}
                 pageCount={Math.ceil(totalItems / pagination.pageSize)}
+                sorting={sorting} // baru
+                onSortingChange={setSorting} // baru
             />
         </AppLayout>
     );

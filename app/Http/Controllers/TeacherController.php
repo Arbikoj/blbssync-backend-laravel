@@ -15,7 +15,9 @@ class TeacherController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $teachers = Teacher::paginate($perPage);
+        $sortBy = $request->get('sort_by', 'name');
+        $sortDir = $request->get('sort_dir', 'asc');
+        $teachers = Teacher::orderBy($sortBy, $sortDir)->paginate($perPage);
 
         return new TeacherResource(true, 'List Data Teachers', $teachers);
     }

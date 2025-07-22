@@ -16,9 +16,11 @@ export const columns: ColumnDef<Teacher>[] = [
     {
         accessorKey: 'name',
         header: 'Nama',
+        enableSorting: true,
     },
     {
         accessorKey: 'code',
         header: 'Kode',
+        enableSorting: true,
     },
 ];

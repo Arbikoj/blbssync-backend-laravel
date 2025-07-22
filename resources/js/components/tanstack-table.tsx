@@ -1,7 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { DataTableProps } from '@/interface/TableProps';
-import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import { ArrowLeft, ArrowRight, Loader2, MoreHorizontal } from 'lucide-react';
+import { flexRender, getCoreRowModel, getSortedRowModel, useReactTable } from '@tanstack/react-table';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Loader2, MoreHorizontal } from 'lucide-react';
 import { Button } from './ui/button';
 
 type PaginationState = {
@@ -22,17 +22,23 @@ export function DataTable<TData, TValue>({
     pagination,
     onPaginationChange,
     pageCount,
+    sorting,
+    onSortingChange,
 }: ServerSideDataTableProps<TData, TValue>) {
     const table = useReactTable({
         data,
         columns,
         pageCount,
         manualPagination: true,
+        manualSorting: true,
         state: {
             pagination,
+            sorting,
         },
         onPaginationChange,
         getCoreRowModel: getCoreRowModel(),
+        onSortingChange,
+        getSortedRowModel: getSortedRowModel(),
     });
 
     function renderPageNumbers({
@@ -97,8 +103,18 @@ export function DataTable<TData, TValue>({
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                                        <TableHead
+                                            key={header.id}
+                                            style={{ cursor: header.column.getCanSort() ? 'pointer' : 'default' }}
+                                            onClick={header.column.getToggleSortingHandler()}
+                                        >
+                                            <div className="flex items-center gap-1">
+                                                {flexRender(header.column.columnDef.header, header.getContext())}
+                                                {{
+                                                    asc: <ChevronUp size={14} />,
+                                                    desc: <ChevronDown size={14} />,
+                                                }[header.column.getIsSorted() as string] ?? null}
+                                            </div>
                                         </TableHead>
                                     ))}
                                 </TableRow>
