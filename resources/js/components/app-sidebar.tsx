@@ -1,11 +1,11 @@
 import { NavFooter } from '@/components/nav-footer';
-import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { DropdownItem, type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid, SquareTerminal } from 'lucide-react';
 import AppLogo from './app-logo';
+import { NavDropdown } from './nav-dropdown';
 
 const mainNavItems: NavItem[] = [
     {
@@ -17,6 +17,39 @@ const mainNavItems: NavItem[] = [
         title: 'Data',
         href: '/data',
         icon: LayoutGrid,
+    },
+];
+
+const dropdownNav: DropdownItem[] = [
+    {
+        title: 'Home',
+        url: '/dashboard',
+        icon: LayoutGrid,
+        isActive: true,
+    },
+    {
+        title: 'Data',
+        url: '#',
+        icon: SquareTerminal,
+        isActive: true,
+        items: [
+            {
+                title: 'Guru',
+                url: '/data/guru',
+            },
+            {
+                title: 'Jurusan',
+                url: '/data/major',
+            },
+            {
+                title: 'Mapel',
+                url: '/data/subject',
+            },
+            {
+                title: 'Jam Pelajaran',
+                url: '/data/hour',
+            },
+        ],
     },
 ];
 
@@ -49,7 +82,8 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                {/* <NavMain items={mainNavItems} /> */}
+                <NavDropdown items={dropdownNav} mainTitle="Admin" />
             </SidebarContent>
 
             <SidebarFooter>
