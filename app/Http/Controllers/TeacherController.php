@@ -17,10 +17,19 @@ class TeacherController extends Controller
         $perPage = $request->get('per_page', 10);
         $sortBy = $request->get('sort_by', 'name');
         $sortDir = $request->get('sort_dir', 'asc');
-        $teachers = Teacher::orderBy($sortBy, $sortDir)->paginate($perPage);
+        $search = $request->get('search');
+
+        $query = Teacher::query();
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        $teachers = $query->orderBy($sortBy, $sortDir)->paginate($perPage);
 
         return new TeacherResource(true, 'List Data Teachers', $teachers);
     }
+
 
     /**
      * Show the form for creating a new resource.

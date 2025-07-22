@@ -27,6 +27,7 @@ const PageGuru = () => {
     const [editData, setEditData] = useState<GuruFormData | undefined>(undefined);
 
     const [sorting, setSorting] = useState<SortingState>([]);
+    const [search, setSearch] = useState('');
 
     const fetchData = () => {
         setLoading(true);
@@ -37,6 +38,7 @@ const PageGuru = () => {
                     per_page: pagination.pageSize,
                     sort_by: sorting[0]?.id,
                     sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
+                    search: search,
                 },
             })
             .then((res) => {
@@ -107,7 +109,22 @@ const PageGuru = () => {
                 initialData={editData}
                 onSubmit={handleSubmit}
             />
-            <div className="flex items-center justify-between px-5 pt-2">{handleAdd && <Button onClick={handleAdd}>Tambah</Button>}</div>
+
+            <div className="flex items-center justify-between px-5 pt-2">
+                <div className="flex items-center gap-2">
+                    <input
+                        type="text"
+                        placeholder="Cari guru..."
+                        value={search}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                            setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+                        }}
+                        className="rounded border px-3 py-1 text-sm"
+                    />
+                </div>
+                <Button onClick={handleAdd}>Tambah</Button>
+            </div>
 
             <DataTable
                 data={data}
@@ -116,8 +133,8 @@ const PageGuru = () => {
                 pagination={pagination}
                 onPaginationChange={setPagination}
                 pageCount={Math.ceil(totalItems / pagination.pageSize)}
-                sorting={sorting} // baru
-                onSortingChange={setSorting} // baru
+                sorting={sorting}
+                onSortingChange={setSorting}
             />
         </AppLayout>
     );
