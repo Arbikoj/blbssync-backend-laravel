@@ -121,13 +121,21 @@ export function DataTable<TData, TValue>({
                             ))}
                         </TableHeader>
                         <TableBody>
-                            {table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
-                                    ))}
+                            {table.getRowModel().rows.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="text-muted-foreground py-6 text-center text-sm">
+                                        Data kosong
+                                    </TableCell>
                                 </TableRow>
-                            ))}
+                            ) : (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow key={row.id}>
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            )}
                         </TableBody>
                     </Table>
 
