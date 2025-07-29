@@ -19,6 +19,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('data/guru/page');
     })->name('teacher.index');
 
+    Route::get('/data/jurusan', function(){
+        return Inertia::render('data/jurusan/page');
+    })->name('major.index');
+
 });
 
 require __DIR__.'/settings.php';

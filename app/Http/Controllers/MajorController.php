@@ -12,9 +12,21 @@ class MajorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $majors = Major::all();
+        $perPage = $request->get('per_page', 10);
+        $sortBy = $request->get('sort_by', 'name');
+        $sortDir = $request->get('sort_dir', 'asc');
+        $search = $request->get('search');
+
+        $query = Major::query();
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        $majors = $query->orderBy($sortBy, $sortDir)->paginate($perPage);
+
         return new DataResource(true, 'List of Majors', $majors);
     }
 

@@ -39,15 +39,19 @@ const dropdownNav: DropdownItem[] = [
             },
             {
                 title: 'Jurusan',
-                url: '/data/major',
+                url: '/data/jurusan',
+            },
+            {
+                title: 'Kelas',
+                url: '/data/kelas',
             },
             {
                 title: 'Mapel',
-                url: '/data/subject',
+                url: '/data/mapel',
             },
             {
                 title: 'Jam Pelajaran',
-                url: '/data/hour',
+                url: '/data/pelajaran',
             },
         ],
     },
