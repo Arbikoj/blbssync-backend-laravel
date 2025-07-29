@@ -55,6 +55,22 @@ const dropdownNav: DropdownItem[] = [
             },
         ],
     },
+    {
+        title: 'Manage',
+        url: '#',
+        icon: SquareTerminal,
+        isActive: true,
+        items: [
+            {
+                title: 'User',
+                url: '/manage/users',
+            },
+            {
+                title: 'Group',
+                url: '/manage/groups',
+            },
+        ],
+    },
 ];
 
 const footerNavItems: NavItem[] = [

@@ -28,3 +28,4 @@ Route::apiResource('/majors', MajorController::class);
 Route::apiResource('/subjects', SubjectController::class);
 Route::apiResource('/groups', GroupController::class);
 Route::apiResource('/lessons', LessonController::class);
+Route::apiResource('/users', UserController::class);

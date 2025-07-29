@@ -14,11 +14,22 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return new UserResource(true, 'List Data users', $users);
+        $perPage = $request->get('per_page', 10);
+        $sortBy = $request->get('sort_by', 'name');
+        $sortDir = $request->get('sort_dir', 'asc');
+        $search = $request->get('search');
 
+        $query = User::query();
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        $users = $query->orderBy($sortBy, $sortDir)->paginate($perPage);
+
+        return new UserResource(true, 'List Data users', $users);
     }
 
     /**
