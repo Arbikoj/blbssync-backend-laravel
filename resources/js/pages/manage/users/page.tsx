@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { User, UserFormData } from '@/interface/User';
+import { UserFormData } from '@/interface/User';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -8,14 +8,14 @@ import axios from 'axios';
 import { Pencil } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { DataTable } from '../../../components/tanstack-table';
-import { Teacher, columns as baseColumns } from './column';
+import { columns as baseColumns } from './column';
 import { DeleteDialog } from './delete';
-import ModalGuru from './modal';
+import ModalUser from './modal';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data User', href: '/manage/users' }];
 
-const PageGuru = () => {
-    const [data, setData] = useState<Teacher[]>([]);
+const PageUser = () => {
+    const [data, setData] = useState<UserFormData[]>([]);
     const [loading, setLoading] = useState(true);
     const [totalItems, setTotalItems] = useState(0);
     const [pagination, setPagination] = useState({
@@ -61,7 +61,7 @@ const PageGuru = () => {
         setModalOpen(true);
     };
 
-    const handleEdit = (user: User) => {
+    const handleEdit = (user: UserFormData) => {
         setModalMode('edit');
         setEditData(user);
         setModalOpen(true);
@@ -91,7 +91,7 @@ const PageGuru = () => {
                     <Button variant="secondary" size="icon" className="text-blue-600 hover:text-blue-700" onClick={() => handleEdit(row.original)}>
                         <Pencil className="h-4 w-4" />
                     </Button>
-                    <DeleteDialog teacherId={row.original.id} teacherName={row.original.name} onDeleted={fetchData} />
+                    <DeleteDialog userId={row.original.id} userName={row.original.name} onDeleted={fetchData} />
                 </div>
             ),
         },
@@ -99,8 +99,8 @@ const PageGuru = () => {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Guru" />
-            <ModalGuru
+            <Head title="User" />
+            <ModalUser
                 open={modalOpen}
                 onOpenChange={(open) => {
                     setModalOpen(open);
@@ -115,7 +115,7 @@ const PageGuru = () => {
                 <div className="flex items-center gap-2">
                     <input
                         type="text"
-                        placeholder="Cari guru..."
+                        placeholder="Cari user..."
                         value={search}
                         onChange={(e) => {
                             setSearch(e.target.value);
@@ -141,4 +141,4 @@ const PageGuru = () => {
     );
 };
 
-export default PageGuru;
+export default PageUser;

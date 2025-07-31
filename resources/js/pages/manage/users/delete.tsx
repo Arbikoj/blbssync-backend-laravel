@@ -15,20 +15,20 @@ import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 interface DeleteDialogProps {
-    teacherId: number;
-    teacherName?: string;
+    userId: number;
+    userName?: string;
     onDeleted: () => void;
 }
 
-export const DeleteDialog: React.FC<DeleteDialogProps> = ({ teacherId, teacherName, onDeleted }) => {
+export const DeleteDialog: React.FC<DeleteDialogProps> = ({ userId, userName, onDeleted }) => {
     const [loading, setLoading] = useState(false);
 
     const handleConfirmDelete = () => {
         setLoading(true);
         axios
-            .delete(`/api/users/${teacherId}`)
+            .delete(`/api/users/${userId}`)
             .then(() => onDeleted())
-            .catch((err) => console.error('Gagal hapus guru:', err))
+            .catch((err) => console.error('Gagal hapus user:', err))
             .finally(() => setLoading(false));
     };
 
@@ -43,7 +43,7 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({ teacherId, teacherNa
                 <AlertDialogHeader>
                     <AlertDialogTitle>Yakin ingin menghapus?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Guru <strong>{teacherName || 'ini'}</strong> akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
+                        User <strong>{userName || 'ini'}</strong> akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
