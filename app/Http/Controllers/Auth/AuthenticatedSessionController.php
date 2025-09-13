@@ -33,7 +33,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $user = Auth::user();
+
+        $token = $user->createToken('react-app-token')->plainTextToken;
+
+        $request->session()->put('auth_token', $token);
+        
+        return redirect()->intended(route('dashboard', absolute: false))->with([
+            'auth_token' => $token
+        ]);
     }
 
     /**

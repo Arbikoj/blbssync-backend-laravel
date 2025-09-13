@@ -28,6 +28,7 @@ const PageGuru = () => {
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [search, setSearch] = useState('');
+    const token = localStorage.getItem("auth_token");
 
     const fetchData = () => {
         setLoading(true);
@@ -39,6 +40,9 @@ const PageGuru = () => {
                     sort_by: sorting[0]?.id,
                     sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
                     search: search,
+                },
+                headers: {
+                    Authorization: token ? `Bearer ${token}` : '',
                 },
             })
             .then((res) => {
