@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-
+import api from '@/lib/api';
 export type GuruFormData = {
     id?: number;
     name: string;
@@ -49,9 +49,9 @@ export default function ModalGuru({ open, onOpenChange, mode, initialData, onSuc
 
         try {
             if (mode === 'add') {
-                await axios.post('/api/teachers', payload);
+                await api.post('/teachers', payload);
             } else {
-                await axios.put(`/api/teachers/${payload.id}`, payload);
+                await api.put(`/teachers/${payload.id}`, payload);
             }
 
             if (onSuccess) onSuccess();

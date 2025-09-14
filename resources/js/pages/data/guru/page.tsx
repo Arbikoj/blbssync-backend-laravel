@@ -10,138 +10,124 @@ import { DataTable } from '../../../components/tanstack-table';
 import { Teacher, columns as baseColumns } from './column';
 import { DeleteDialog } from './delete';
 import ModalGuru, { GuruFormData } from './modal';
-
+import api from '@/lib/api';
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data Guru', href: '/data/guru' }];
 
 const PageGuru = () => {
-    const [data, setData] = useState<Teacher[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [totalItems, setTotalItems] = useState(0);
-    const [pagination, setPagination] = useState({
-        pageIndex: 0,
-        pageSize: 10,
-    });
+  const [data, setData] = useState<Teacher[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
-    const [modalOpen, setModalOpen] = useState(false);
-    const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
-    const [editData, setEditData] = useState<GuruFormData | undefined>(undefined);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [editData, setEditData] = useState<GuruFormData | undefined>(undefined);
 
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [search, setSearch] = useState('');
-    const token = localStorage.getItem("auth_token");
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [search, setSearch] = useState('');
 
-    const fetchData = () => {
-        setLoading(true);
-        axios
-            .get('/api/teachers', {
-                params: {
-                    page: pagination.pageIndex + 1,
-                    per_page: pagination.pageSize,
-                    sort_by: sorting[0]?.id,
-                    sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
-                    search: search,
-                },
-                headers: {
-                    Authorization: token ? `Bearer ${token}` : '',
-                },
-            })
-            .then((res) => {
-                const { data, meta } = res.data;
-                setData(data);
-                setTotalItems(meta.total);
-            })
-            .catch((err) => console.error(err))
-            .finally(() => setLoading(false));
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, [pagination, sorting]);
-
-    const handleAdd = () => {
-        setModalMode('add');
-        setEditData(undefined);
-        setModalOpen(true);
-    };
-
-    const handleEdit = (teacher: Teacher) => {
-        setModalMode('edit');
-        setEditData(teacher);
-        setModalOpen(true);
-    };
-
-    const handleSubmit = (formData: GuruFormData) => {
-        if (modalMode === 'add') {
-            axios
-                .post('/api/teachers', formData)
-                .then(fetchData)
-                .finally(() => setModalOpen(false));
-        } else {
-            axios
-                .put(`/api/teachers/${formData.id}`, formData)
-                .then(fetchData)
-                .finally(() => setModalOpen(false));
-        }
-    };
-
-    const columns = [
-        ...baseColumns,
-        {
-            id: 'actions',
-            header: 'Aksi',
-            cell: ({ row }: any) => (
-                <div className="flex items-center space-x-2">
-                    <Button variant="secondary" size="icon" className="text-blue-600 hover:text-blue-700" onClick={() => handleEdit(row.original)}>
-                        <Pencil className="h-4 w-4" />
-                    </Button>
-                    <DeleteDialog teacherId={row.original.id} teacherName={row.original.name} onDeleted={fetchData} />
-                </div>
-            ),
+  const fetchData = () => {
+    setLoading(true);
+    api
+      .get('/teachers', {
+        params: {
+          page: pagination.pageIndex + 1,
+          per_page: pagination.pageSize,
+          sort_by: sorting[0]?.id,
+          sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
+          search: search,
         },
-    ];
+      })
+      .then((res) => {
+        const { data, meta } = res.data;
+        setData(data);
+        setTotalItems(meta.total);
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.response?.status === 401) window.location.href = '/login';
+      })
+      .finally(() => setLoading(false));
+  };
 
-    return (
-        <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Guru" />
-            <ModalGuru
-                open={modalOpen}
-                onOpenChange={(open) => {
-                    setModalOpen(open);
-                    if (!open) fetchData();
-                }}
-                mode={modalMode}
-                initialData={editData}
-                onSubmit={handleSubmit}
-            />
+  useEffect(() => {
+    fetchData();
+  }, [pagination, sorting]);
 
-            <div className="flex items-center justify-between px-5 pt-2">
-                <div className="flex items-center gap-2">
-                    <input
-                        type="text"
-                        placeholder="Cari guru..."
-                        value={search}
-                        onChange={(e) => {
-                            setSearch(e.target.value);
-                            setPagination((prev) => ({ ...prev, pageIndex: 0 }));
-                        }}
-                        className="rounded border px-3 py-1 text-sm"
-                    />
-                </div>
-                <Button onClick={handleAdd}>Tambah</Button>
-            </div>
+  const handleAdd = () => {
+    setModalMode('add');
+    setEditData(undefined);
+    setModalOpen(true);
+  };
 
-            <DataTable
-                data={data}
-                columns={columns}
-                isLoading={loading}
-                pagination={pagination}
-                onPaginationChange={setPagination}
-                pageCount={Math.ceil(totalItems / pagination.pageSize)}
-                sorting={sorting}
-                onSortingChange={setSorting}
-            />
-        </AppLayout>
-    );
+  const handleEdit = (teacher: Teacher) => {
+    setModalMode('edit');
+    setEditData(teacher);
+    setModalOpen(true);
+  };
+
+  const columns = [
+    ...baseColumns,
+    {
+      id: 'actions',
+      header: 'Aksi',
+      cell: ({ row }: any) => (
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="secondary"
+            size="icon"
+            className="text-blue-600 hover:text-blue-700"
+            onClick={() => handleEdit(row.original)}
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <DeleteDialog teacherId={row.original.id} teacherName={row.original.name} onDeleted={fetchData} />
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <AppLayout breadcrumbs={breadcrumbs}>
+      <Head title="Guru" />
+      <ModalGuru
+        open={modalOpen}
+        onOpenChange={(open) => {
+          setModalOpen(open);
+          if (!open) fetchData();
+        }}
+        mode={modalMode}
+        initialData={editData}
+      />
+
+      <div className="flex items-center justify-between px-5 pt-2">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Cari guru..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+            }}
+            className="rounded border px-3 py-1 text-sm"
+          />
+        </div>
+        <Button onClick={handleAdd}>Tambah</Button>
+      </div>
+
+      <DataTable
+        data={data}
+        columns={columns}
+        isLoading={loading}
+        pagination={pagination}
+        onPaginationChange={setPagination}
+        pageCount={Math.ceil(totalItems / pagination.pageSize)}
+        sorting={sorting}
+        onSortingChange={setSorting}
+      />
+    </AppLayout>
+  );
 };
 
 export default PageGuru;

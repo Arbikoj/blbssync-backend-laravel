@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import axios from 'axios';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import api from '@/lib/api';
 
 interface DeleteDialogProps {
     teacherId: number;
@@ -25,8 +26,8 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({ teacherId, teacherNa
 
     const handleConfirmDelete = () => {
         setLoading(true);
-        axios
-            .delete(`/api/teachers/${teacherId}`)
+        api
+            .delete(`/teachers/${teacherId}`)
             .then(() => onDeleted())
             .catch((err) => console.error('Gagal hapus guru:', err))
             .finally(() => setLoading(false));
