@@ -11,6 +11,7 @@ import { DataTable } from '../../../components/tanstack-table';
 import { columns as baseColumns } from './column';
 import { DeleteDialog } from './delete';
 import ModalMajor, { MajorFormData } from './modal';
+import api from '@/lib/api';
 
 const breadcrumbs: BreadcrumbItem[] = [{ title: 'Data Jurusan', href: '/data/jurusan' }];
 
@@ -32,8 +33,8 @@ const PageMajor = () => {
 
     const fetchData = () => {
         setLoading(true);
-        axios
-            .get('/api/majors', {
+        api
+            .get('/majors', {
                 params: {
                     page: pagination.pageIndex + 1,
                     per_page: pagination.pageSize,
@@ -67,20 +68,6 @@ const PageMajor = () => {
         setModalOpen(true);
     };
 
-    const handleSubmit = (formData: MajorFormData) => {
-        if (modalMode === 'add') {
-            axios
-                .post('/api/majors', formData)
-                .then(fetchData)
-                .finally(() => setModalOpen(false));
-        } else {
-            axios
-                .put(`/api/majors/${formData.id}`, formData)
-                .then(fetchData)
-                .finally(() => setModalOpen(false));
-        }
-    };
-
     const columns = [
         ...baseColumns,
         {
@@ -108,7 +95,6 @@ const PageMajor = () => {
                 }}
                 mode={modalMode}
                 initialData={editData}
-                onSubmit={handleSubmit}
             />
 
             <div className="flex items-center justify-between px-5 pt-2">

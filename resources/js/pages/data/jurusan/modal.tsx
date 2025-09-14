@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
+import api from '@/lib/api';
 
 export type MajorFormData = {
     id?: number;
@@ -44,9 +45,9 @@ export default function ModalMajor({ open, onOpenChange, mode, initialData, onSu
 
         try {
             if (mode === 'add') {
-                await axios.post('/api/majors', payload);
+                await api.post('/majors', payload);
             } else {
-                await axios.put(`/api/majors/${payload.id}`, payload);
+                await api.put(`/majors/${payload.id}`, payload);
             }
 
             if (onSuccess) onSuccess();

@@ -20,12 +20,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('/teachers', TeacherController::class);
+    Route::apiResource('/majors', MajorController::class);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/users', [UserController::class, 'store']);
 
-Route::apiResource('/majors', MajorController::class);
 Route::apiResource('/subjects', SubjectController::class);
 Route::apiResource('/groups', GroupController::class);
 Route::apiResource('/lessons', LessonController::class);
