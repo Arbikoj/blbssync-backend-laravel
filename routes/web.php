@@ -23,6 +23,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('data/jurusan/page');
     })->name('major.index');
 
+    Route::get('/data/kelas', function(){
+        return Inertia::render('data/kelas/page');
+    })->name('kelas.index');
+
     Route::get('/manage/users', function(){
         return Inertia::render('manage/users/page');
     })->name('user.index');
