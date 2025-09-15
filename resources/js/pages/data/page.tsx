@@ -14,7 +14,7 @@ const cards = [
     { title: 'Mapel', href: '/data/mapel' },
     { title: 'Jurusan', href: '/data/jurusan' },
     { title: 'Kelas', href: '/data/kelas' },
-    { title: 'Jam Pelajaran', href: '/data/jam-pelajaran' },
+    { title: 'Jam Pelajaran', href: '/data/jam' },
 ];
 
 export default function DataPage() {

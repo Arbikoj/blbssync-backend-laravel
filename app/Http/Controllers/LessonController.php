@@ -12,10 +12,22 @@ class LessonController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lessons = Lesson::all();
-        return new DataResource(true, 'List of Lessons', $lessons);
+        $perPage = $request->get('per_page', 10);
+        $sortBy = $request->get('sort_by', 'state');
+        $sortDir = $request->get('sort_dir', 'asc');
+        $search = $request->get('search');
+
+        $query = Lesson::query();
+
+        if ($search) {
+            $query->where('state', 'like', '%' . $search . '%');
+        }
+
+        $lesson = $query->orderBy($sortBy, $sortDir)->paginate($perPage);
+
+        return new DataResource(true, 'List Data Lessons', $lesson);
     }
 
     /**

@@ -31,6 +31,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('data/mapel/page');
     })->name('mapel.index');
 
+    Route::get('/data/jam', function(){
+        return Inertia::render('data/jam/page');
+    })->name('jam.index');
+
     Route::get('/manage/users', function(){
         return Inertia::render('manage/users/page');
     })->name('user.index');

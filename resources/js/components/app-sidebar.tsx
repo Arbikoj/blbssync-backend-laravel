@@ -51,7 +51,7 @@ const dropdownNav: DropdownItem[] = [
             },
             {
                 title: 'Jam Pelajaran',
-                url: '/data/pelajaran',
+                url: '/data/jam',
             },
         ],
     },
