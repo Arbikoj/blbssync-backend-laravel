@@ -27,6 +27,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('data/kelas/page');
     })->name('kelas.index');
 
+    Route::get('/data/mapel', function(){
+        return Inertia::render('data/mapel/page');
+    })->name('mapel.index');
+
     Route::get('/manage/users', function(){
         return Inertia::render('manage/users/page');
     })->name('user.index');

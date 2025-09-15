@@ -12,9 +12,21 @@ class SubjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $subjects = Subject::all();
+        $perPage = $request->get('per_page', 10);
+        $sortBy = $request->get('sort_by', 'name');
+        $sortDir = $request->get('sort_dir', 'asc');
+        $search = $request->get('search');
+
+        $query = Subject::query();
+
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        $subjects = $query->orderBy($sortBy, $sortDir)->paginate($perPage);
+
         return new DataResource(true, 'List Data Subjects', $subjects);
     }
 
