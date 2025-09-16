@@ -7,6 +7,7 @@ use App\Http\Controllers\LessonController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\ScheduleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,3 +31,4 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/users', [UserController::class, 'store']);
 
 Route::apiResource('/users', UserController::class);
+Route::apiResource('/schedules', ScheduleController::class);

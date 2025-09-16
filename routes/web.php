@@ -35,6 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('data/jam/page');
     })->name('jam.index');
 
+    Route::get('/data/jadwal', function(){
+        return Inertia::render('data/jadwal/page');
+    })->name('jadwal.index');
+
     Route::get('/manage/users', function(){
         return Inertia::render('manage/users/page');
     })->name('user.index');
