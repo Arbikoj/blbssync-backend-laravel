@@ -8,6 +8,7 @@ use App\Http\Controllers\MajorController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\AttendanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/groups', GroupController::class);
     Route::apiResource('/subjects', SubjectController::class);
     Route::apiResource('/lessons', LessonController::class);
+
+    Route::apiResource('/attendances', AttendanceController::class);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -32,3 +35,4 @@ Route::post('/users', [UserController::class, 'store']);
 
 Route::apiResource('/users', UserController::class);
 Route::apiResource('/schedules', ScheduleController::class);
+

@@ -75,6 +75,12 @@ const dropdownNav: DropdownItem[] = [
             },
         ],
     },
+    {
+        title: 'Absensi Guru',
+        url: '/absensi',
+        icon: SquareTerminal,
+        isActive: true,
+    },
 ];
 
 const footerNavItems: NavItem[] = [
