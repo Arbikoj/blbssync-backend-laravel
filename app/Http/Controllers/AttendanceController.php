@@ -62,6 +62,44 @@ class AttendanceController extends Controller
             return response()->json(['success' => false, 'message' => $validator->errors()], 422);
         }
 
+        $hariIni = \Carbon\Carbon::now()->locale('id')->dayName;
+
+        // Cek jadwal
+        $schedule = \App\Models\Schedule::where('id', $request->schedule_id)
+            ->where('day', $hariIni)
+            ->where('teacher_id', $request->teacher_id)
+            ->first();
+
+        if (!$schedule) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Guru tidak memiliki jadwal pada hari ini atau schedule_id tidak sesuai.'
+            ], 422);
+        }
+
+        // Cek apakah guru sudah ada absensi hari ini untuk jadwal ini
+        $attendance = Attendance::where('schedule_id', $request->schedule_id)
+            ->where('teacher_id', $request->teacher_id)
+            ->whereDate('check_in', now()->toDateString())
+            ->first();
+
+        if ($attendance) {
+            if (is_null($attendance->check_out)) {
+                $attendance->check_out = now();
+                $attendance->status = 'hadir';
+                $attendance->save();
+
+                return new DataResource(true, 'Check-out berhasil', $attendance);
+            } else {
+                // Sudah check-in dan check-out
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru sudah menyelesaikan absensi hari ini untuk jadwal ini.'
+                ], 422);
+            }
+        }
+
+        // Jika belum ada absensi → buat baru (check-in)
         $attendance = Attendance::create([
             'schedule_id' => $request->schedule_id,
             'teacher_id'  => $request->teacher_id,
@@ -70,11 +108,11 @@ class AttendanceController extends Controller
             'status'      => 'hadir',
         ]);
 
-        return new DataResource(true, 'Attendance Created Successfully', $attendance);
+        return new DataResource(true, 'Check-in berhasil', $attendance);
     }
 
 
-
+    
     /**
      * Display the specified resource.
      */
