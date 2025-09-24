@@ -53,7 +53,6 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'schedule_id'   => 'required|exists:schedules,id',
             'teacher_id'    => 'required|exists:teachers,id',
             'user_type'     => 'required|string|in:teacher,student',
         ]);
@@ -64,21 +63,20 @@ class AttendanceController extends Controller
 
         $hariIni = \Carbon\Carbon::now()->locale('id')->dayName;
 
-        // Cek jadwal
-        $schedule = \App\Models\Schedule::where('id', $request->schedule_id)
-            ->where('day', $hariIni)
+        // Cari jadwal guru berdasarkan hari ini
+        $schedule = \App\Models\Schedule::where('day', $hariIni)
             ->where('teacher_id', $request->teacher_id)
             ->first();
 
         if (!$schedule) {
             return response()->json([
                 'success' => false,
-                'message' => 'Guru tidak memiliki jadwal pada hari ini atau schedule_id tidak sesuai.'
+                'message' => 'Guru tidak memiliki jadwal pada hari ini.'
             ], 422);
         }
 
         // Cek apakah guru sudah ada absensi hari ini untuk jadwal ini
-        $attendance = Attendance::where('schedule_id', $request->schedule_id)
+        $attendance = Attendance::where('schedule_id', $schedule->id)
             ->where('teacher_id', $request->teacher_id)
             ->whereDate('check_in', now()->toDateString())
             ->first();
@@ -91,7 +89,6 @@ class AttendanceController extends Controller
 
                 return new DataResource(true, 'Check-out berhasil', $attendance);
             } else {
-                // Sudah check-in dan check-out
                 return response()->json([
                     'success' => false,
                     'message' => 'Guru sudah menyelesaikan absensi hari ini untuk jadwal ini.'
@@ -101,7 +98,7 @@ class AttendanceController extends Controller
 
         // Jika belum ada absensi → buat baru (check-in)
         $attendance = Attendance::create([
-            'schedule_id' => $request->schedule_id,
+            'schedule_id' => $schedule->id,
             'teacher_id'  => $request->teacher_id,
             'user_type'   => $request->user_type,
             'check_in'    => now(),
