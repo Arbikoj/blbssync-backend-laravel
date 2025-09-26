@@ -62,16 +62,21 @@ class AttendanceController extends Controller
         }
 
         $hariIni = \Carbon\Carbon::now()->locale('id')->dayName;
+        $now     = \Carbon\Carbon::now()->format('H:i:s');
 
-        // Cari jadwal guru berdasarkan hari ini
-        $schedule = \App\Models\Schedule::where('day', $hariIni)
+        $schedule = \App\Models\Schedule::with('lesson')
+            ->where('day', $hariIni)
             ->where('teacher_id', $request->teacher_id)
+            ->whereHas('lesson', function ($q) use ($now) {
+                $q->where('start_hour', '<=', $now)
+                ->where('end_hour', '>=', $now);
+            })
             ->first();
 
         if (!$schedule) {
             return response()->json([
                 'success' => false,
-                'message' => 'Guru tidak memiliki jadwal pada hari ini.'
+                'message' => 'Tidak ada jadwal guru yang aktif pada jam ini.'
             ], 422);
         }
 
