@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Teacher;
+use App\Models\Schedule;
 use Illuminate\Http\Request;
 use App\Http\Resources\TeacherResource;
 use Illuminate\Support\Facades\Validator;
@@ -136,5 +137,25 @@ class TeacherController extends Controller
         $teacher->delete();
 
         return new TeacherResource(true, 'Teacher Deleted Successfully', null);
+    }
+
+    public function getTeacherScheduledToday(string $scheduleId)
+    {
+        $schedule = Schedule::with('teacher')->find($scheduleId);
+
+        if (!$schedule) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Schedule not found'
+            ], 404);
+        }
+
+        $teacher = $schedule->teacher;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher for selected schedule',
+            'data' => [$teacher]
+        ]);
     }
 }

@@ -36,19 +36,17 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
         }
     };
 
-    const fetchTeachers = async () => {
+    const fetchTeachersBySchedule = async (scheduleId: number) => {
         try {
-            const res = await api.get('/teachers');
+            const res = await api.get(`/teachers/scheduled/${scheduleId}`);
             setTeachers(res.data.data);
         } catch (error) {
-            console.error('Gagal load teachers:', error);
+            console.error('Gagal load teachers by schedule:', error);
         }
     };
 
-    // === useEffects ===
     useEffect(() => {
         fetchSchedules();
-        fetchTeachers();
     }, []);
 
     useEffect(() => {
@@ -57,6 +55,10 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
             setSchedulesId(initialData.schedule_id);
             setUserType(initialData.user_type);
             setStatus(initialData.status);
+
+            if (initialData.schedule_id) {
+                fetchTeachersBySchedule(initialData.schedule_id);
+            }
         } else {
             setTeacherId(null);
             setSchedulesId(null);
@@ -107,28 +109,17 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
-                        <Label htmlFor="teacher">Guru</Label>
-                        {teachers.length > 0 && (
-                            <Select value={teacherId !== null ? teacherId.toString() : ''} onValueChange={(val) => setTeacherId(Number(val))}>
-                                <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Pilih Guru" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {teachers.map((teacher) => (
-                                        <SelectItem key={teacher.id} value={teacher.id.toString()}>
-                                            {teacher.name}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        )}
-                        {errors.teacher_id && <p className="mt-1 text-sm text-red-600">{errors.teacher_id[0]}</p>}
-                    </div>
-
-                    <div>
                         <Label htmlFor="schedule">Jadwal</Label>
                         {schedules.length > 0 && (
-                            <Select value={schedulesId !== null ? schedulesId.toString() : ''} onValueChange={(val) => setSchedulesId(Number(val))}>
+                            <Select
+                                value={schedulesId !== null ? schedulesId.toString() : ''}
+                                onValueChange={(val) => {
+                                    const id = Number(val);
+                                    setSchedulesId(id);
+                                    setTeacherId(null);
+                                    fetchTeachersBySchedule(id);
+                                }}
+                            >
                                 <SelectTrigger className="w-full">
                                     <SelectValue placeholder="Pilih Kelas" />
                                 </SelectTrigger>
@@ -142,6 +133,37 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
                             </Select>
                         )}
                         {errors.schedule_id && <p className="mt-1 text-sm text-red-600">{errors.schedule_id[0]}</p>}
+                    </div>
+
+                    <div>
+                        <Label htmlFor="teacher">Guru</Label>
+                        {schedulesId ? (
+                            <Select value={teacherId !== null ? teacherId.toString() : ''} onValueChange={(val) => setTeacherId(Number(val))}>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih Guru" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {teachers.length > 0 ? (
+                                        teachers.map((teacher) => (
+                                            <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                                                {teacher.name}
+                                            </SelectItem>
+                                        ))
+                                    ) : (
+                                        <SelectItem value="no-teacher" disabled>
+                                            Tidak ada guru untuk jadwal ini
+                                        </SelectItem>
+                                    )}
+                                </SelectContent>
+                            </Select>
+                        ) : (
+                            <Select disabled>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Pilih Jadwal terlebih dahulu" />
+                                </SelectTrigger>
+                            </Select>
+                        )}
+                        {errors.teacher_id && <p className="mt-1 text-sm text-red-600">{errors.teacher_id[0]}</p>}
                     </div>
 
                     <div>

@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/lessons', LessonController::class);
 
     Route::apiResource('/attendances', AttendanceController::class);
+
+    Route::get('/teachers/scheduled/{scheduleId}', [TeacherController::class, 'getTeacherScheduledToday']);
     
 });
 
