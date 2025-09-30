@@ -89,7 +89,6 @@ class AttendanceController extends Controller
         if ($attendance) {
             if (is_null($attendance->check_out)) {
                 $attendance->check_out = now();
-                $attendance->status = 'hadir';
                 $attendance->save();
 
                 return new DataResource(true, 'Check-out berhasil', $attendance);
@@ -101,13 +100,25 @@ class AttendanceController extends Controller
             }
         }
 
+        $start = $schedule->lesson->start_hour;
+        $startHour = \Carbon\Carbon::createFromFormat('H:i', $start, 'Asia/Jakarta');
+
+        $startPlus15 = $startHour->copy()->addMinutes(15);
+
+        $timeNow = now('Asia/Jakarta');
+
+        $status = 'hadir';
+        if ($timeNow->gt($startPlus15)) {
+            $status = 'terlambat';
+        }
+
         // Jika belum ada absensi → buat baru (check-in)
         $attendance = Attendance::create([
             'schedule_id' => $schedule->id,
             'teacher_id'  => $request->teacher_id,
             'user_type'   => $request->user_type,
             'check_in'    => now(),
-            'status'      => 'hadir',
+            'status'      => $status,
         ]);
 
         return new DataResource(true, 'Check-in berhasil', $attendance);

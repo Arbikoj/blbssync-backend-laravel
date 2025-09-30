@@ -33,4 +33,9 @@ export const columns: ColumnDef<ScheduleTypes>[] = [
         header: 'Jam Keluar',
         enableSorting: false,
     },
+    {
+        accessorKey: 'status',
+        header: 'Status',
+        enableSorting: false,
+    },
 ];

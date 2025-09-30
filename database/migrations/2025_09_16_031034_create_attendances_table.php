@@ -18,7 +18,7 @@ return new class extends Migration
             $table->enum('user_type', ['teacher', 'student']);
             $table->timestamp('check_in')->nullable();
             $table->timestamp('check_out')->nullable();
-            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpa'])->nullable();
+            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpa', 'terlambat'])->nullable();
             $table->timestamps();
 
             $table->foreign('schedule_id')
