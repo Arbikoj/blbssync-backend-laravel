@@ -28,6 +28,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/lessons', LessonController::class);
 
     Route::apiResource('/attendances', AttendanceController::class);
+    
 });
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -35,4 +36,6 @@ Route::post('/users', [UserController::class, 'store']);
 
 Route::apiResource('/users', UserController::class);
 Route::apiResource('/schedules', ScheduleController::class);
+
+Route::post('/attendances/devices', [AttendanceController::class, 'devices']);
 

@@ -53,88 +53,24 @@ class AttendanceController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'schedule_id'   => 'required|exists:schedules,id',
             'teacher_id'    => 'required|exists:teachers,id',
             'user_type'     => 'required|string|in:teacher,student',
+            'status'        => 'required|string|in:sakit,izin,hadir,alpa,terlambat',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['success' => false, 'message' => $validator->errors()], 422);
         }
 
-        $hariIni = \Carbon\Carbon::now()->locale('id')->dayName;
-        $now     = \Carbon\Carbon::now()->format('H:i:s');
-
-        $schedule = \App\Models\Schedule::with('lesson')
-            ->where('day', $hariIni)
-            ->where('teacher_id', $request->teacher_id)
-            ->whereHas('lesson', function ($q) use ($now) {
-                $q->where('start_hour', '<=', $now)
-                ->where('end_hour', '>=', $now);
-            })
-            ->first();
-
-        if (!$schedule) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tidak ada jadwal guru yang aktif pada jam ini.'
-            ], 422);
-        }
-
-        $timeNow = now('Asia/Jakarta');
-
-        $end = $schedule->lesson->end_hour;
-        $endHour = \Carbon\Carbon::createFromFormat('H:i', $end, 'Asia/Jakarta');
-
-        $endMinus15 = $endHour->copy()->subMinutes(15);
-
-        // Cek apakah guru sudah ada absensi hari ini untuk jadwal ini
-        $attendance = Attendance::where('schedule_id', $schedule->id)
-            ->where('teacher_id', $request->teacher_id)
-            ->whereDate('check_in', now()->toDateString())
-            ->first();
-
-        if ($attendance) {
-            if (is_null($attendance->check_out)) {
-                // Hanya bisa checkout kalau sudah masuk 15 menit terakhir
-                if ($timeNow->gte($endMinus15)) {
-                    $attendance->check_out = $timeNow;
-                    $attendance->save();
-
-                    return new DataResource(true, 'Check-out berhasil', $attendance);
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Belum bisa check-out, tunggu sampai 15 menit terakhir sebelum jam selesai.'
-                    ], 422);
-                }
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Guru sudah menyelesaikan absensi hari ini untuk jadwal ini.'
-                ], 422);
-            }
-        }
-
-        $start = $schedule->lesson->start_hour;
-        $startHour = \Carbon\Carbon::createFromFormat('H:i', $start, 'Asia/Jakarta');
-
-        $startPlus15 = $startHour->copy()->addMinutes(15);
-
-        $status = 'hadir';
-        if ($timeNow->gt($startPlus15)) {
-            $status = 'terlambat';
-        }
-
-        // Jika belum ada absensi → buat baru (check-in)
         $attendance = Attendance::create([
-            'schedule_id' => $schedule->id,
+            'schedule_id' => $request->schedule_id,
             'teacher_id'  => $request->teacher_id,
             'user_type'   => $request->user_type,
-            'check_in'    => now(),
-            'status'      => $status,
+            'status'      => $request->status,
         ]);
 
-        return new DataResource(true, 'Check-in berhasil', $attendance);
+        return new DataResource(true, 'Attendance Created Successfully', $attendance);
     }
 
 
@@ -204,5 +140,92 @@ class AttendanceController extends Controller
         $attendance->delete();
 
         return new DataResource(true, 'Attendance Deleted Successfully', null);
+    }
+
+    public function devices(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'teacher_id'    => 'required|exists:teachers,id',
+            'user_type'     => 'required|string|in:teacher,student',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['success' => false, 'message' => $validator->errors()], 422);
+        }
+
+        $hariIni = \Carbon\Carbon::now()->locale('id')->dayName;
+        $now     = \Carbon\Carbon::now()->format('H:i:s');
+
+        $schedule = \App\Models\Schedule::with('lesson')
+            ->where('day', $hariIni)
+            ->where('teacher_id', $request->teacher_id)
+            ->whereHas('lesson', function ($q) use ($now) {
+                $q->where('start_hour', '<=', $now)
+                ->where('end_hour', '>=', $now);
+            })
+            ->first();
+
+        if (!$schedule) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak ada jadwal guru yang aktif pada jam ini.'
+            ], 422);
+        }
+
+        $timeNow = now('Asia/Jakarta');
+
+        $end = $schedule->lesson->end_hour;
+        $endHour = \Carbon\Carbon::createFromFormat('H:i', $end, 'Asia/Jakarta');
+
+        $endMinus = $endHour->copy()->subMinutes(10);
+
+        // Cek apakah guru sudah ada absensi hari ini untuk jadwal ini
+        $attendance = Attendance::where('schedule_id', $schedule->id)
+            ->where('teacher_id', $request->teacher_id)
+            ->whereDate('check_in', now()->toDateString())
+            ->first();
+
+        if ($attendance) {
+            if (is_null($attendance->check_out)) {
+                // Hanya bisa checkout kalau sudah masuk 15 menit terakhir
+                if ($timeNow->gte($endMinus)) {
+                    $attendance->check_out = $timeNow;
+                    $attendance->save();
+
+                    return new DataResource(true, 'Check-out berhasil', $attendance);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Belum bisa check-out, tunggu sampai 10 menit terakhir sebelum jam selesai.'
+                    ], 422);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Guru sudah menyelesaikan absensi hari ini untuk jadwal ini.'
+                ], 422);
+            }
+        }
+
+        $start = $schedule->lesson->start_hour;
+        $startHour = \Carbon\Carbon::createFromFormat('H:i', $start, 'Asia/Jakarta');
+
+        $startPlus = $startHour->copy()->addMinutes(10);
+
+        $status = 'hadir';
+        if ($timeNow->gt($startPlus)) {
+            $status = 'terlambat';
+        }
+
+        // Jika belum ada absensi → buat baru (check-in)
+        $attendance = Attendance::create([
+            'schedule_id' => $schedule->id,
+            'teacher_id'  => $request->teacher_id,
+            'user_type'   => $request->user_type,
+            'check_in'    => now(),
+            'status'      => $status,
+        ]);
+
+        return new DataResource(true, 'Check-in berhasil', $attendance);
     }
 }

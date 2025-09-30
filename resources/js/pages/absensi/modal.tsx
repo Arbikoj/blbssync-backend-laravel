@@ -17,6 +17,7 @@ type ModalScheduleProps = {
 };
 
 export default function ModalSchedule({ open, onOpenChange, mode, initialData, onSuccess }: ModalScheduleProps) {
+    const [status, setStatus] = useState('');
     const [userType, setUserType] = useState('');
     const [teacherId, setTeacherId] = useState<number | null>(null);
     const [schedulesId, setSchedulesId] = useState<number | null>(null);
@@ -55,10 +56,12 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
             setTeacherId(initialData.teacher_id);
             setSchedulesId(initialData.schedule_id);
             setUserType(initialData.user_type);
+            setStatus(initialData.status);
         } else {
             setTeacherId(null);
             setSchedulesId(null);
             setUserType('');
+            setStatus('');
         }
         setErrors({});
     }, [initialData, open]);
@@ -73,6 +76,7 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
             teacher_id: teacherId ?? 0,
             schedule_id: schedulesId ?? 0,
             user_type: userType ?? '',
+            status: status ?? '',
         };
 
         try {
@@ -152,6 +156,23 @@ export default function ModalSchedule({ open, onOpenChange, mode, initialData, o
                             </SelectContent>
                         </Select>
                         {errors.userType && <p className="mt-1 text-sm text-red-600">{errors.userType[0]}</p>}
+                    </div>
+
+                    <div>
+                        <Label htmlFor="schedule">Keterangan</Label>
+                        <Select value={status !== null ? status.toString() : ''} onValueChange={(val) => setStatus(val)}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Pilih" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="hadir">Hadir</SelectItem>
+                                <SelectItem value="terlambat">Terlambat</SelectItem>
+                                <SelectItem value="sakit">Sakit</SelectItem>
+                                <SelectItem value="izin">Izin</SelectItem>
+                                <SelectItem value="alpa">Alpa</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        {errors.status && <p className="mt-1 text-sm text-red-600">{errors.status[0]}</p>}
                     </div>
 
                     <div className="flex justify-end">
