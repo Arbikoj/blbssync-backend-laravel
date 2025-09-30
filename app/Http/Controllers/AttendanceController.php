@@ -80,6 +80,13 @@ class AttendanceController extends Controller
             ], 422);
         }
 
+        $timeNow = now('Asia/Jakarta');
+
+        $end = $schedule->lesson->end_hour;
+        $endHour = \Carbon\Carbon::createFromFormat('H:i', $end, 'Asia/Jakarta');
+
+        $endMinus15 = $endHour->copy()->subMinutes(15);
+
         // Cek apakah guru sudah ada absensi hari ini untuk jadwal ini
         $attendance = Attendance::where('schedule_id', $schedule->id)
             ->where('teacher_id', $request->teacher_id)
@@ -88,10 +95,18 @@ class AttendanceController extends Controller
 
         if ($attendance) {
             if (is_null($attendance->check_out)) {
-                $attendance->check_out = now();
-                $attendance->save();
+                // Hanya bisa checkout kalau sudah masuk 15 menit terakhir
+                if ($timeNow->gte($endMinus15)) {
+                    $attendance->check_out = $timeNow;
+                    $attendance->save();
 
-                return new DataResource(true, 'Check-out berhasil', $attendance);
+                    return new DataResource(true, 'Check-out berhasil', $attendance);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Belum bisa check-out, tunggu sampai 15 menit terakhir sebelum jam selesai.'
+                    ], 422);
+                }
             } else {
                 return response()->json([
                     'success' => false,
@@ -104,8 +119,6 @@ class AttendanceController extends Controller
         $startHour = \Carbon\Carbon::createFromFormat('H:i', $start, 'Asia/Jakarta');
 
         $startPlus15 = $startHour->copy()->addMinutes(15);
-
-        $timeNow = now('Asia/Jakarta');
 
         $status = 'hadir';
         if ($timeNow->gt($startPlus15)) {
