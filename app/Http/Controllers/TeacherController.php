@@ -20,7 +20,7 @@ class TeacherController extends Controller
         $sortDir = $request->get('sort_dir', 'asc');
         $search = $request->get('search');
 
-        $query = Teacher::query();
+        $query = Teacher::query()->with('rfidCard');
 
         if ($search) {
             $query->where('name', 'like', '%' . $search . '%');

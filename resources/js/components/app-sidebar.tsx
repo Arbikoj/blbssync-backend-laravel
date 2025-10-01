@@ -70,8 +70,8 @@ const dropdownNav: DropdownItem[] = [
                 url: '/manage/users',
             },
             {
-                title: 'Group',
-                url: '/manage/groups',
+                title: 'Rfid Cards',
+                url: '/manage/rfids',
             },
         ],
     },

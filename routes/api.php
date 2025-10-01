@@ -9,6 +9,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\RfidCardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/lessons', LessonController::class);
 
     Route::apiResource('/attendances', AttendanceController::class);
+    Route::apiResource('/rfidcards', RfidCardController::class);
 
     Route::get('/teachers/scheduled/{scheduleId}', [TeacherController::class, 'getTeacherScheduledToday']);
     
