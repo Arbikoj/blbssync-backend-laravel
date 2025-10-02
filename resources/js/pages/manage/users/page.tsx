@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { UserFormData } from '@/interface/User';
 import AppLayout from '@/layouts/app-layout';
+import api from '@/lib/api';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { SortingState } from '@tanstack/react-table';
@@ -32,16 +33,15 @@ const PageUser = () => {
 
     const fetchData = () => {
         setLoading(true);
-        axios
-            .get('/api/users', {
-                params: {
-                    page: pagination.pageIndex + 1,
-                    per_page: pagination.pageSize,
-                    sort_by: sorting[0]?.id,
-                    sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
-                    search: search,
-                },
-            })
+        api.get('/users', {
+            params: {
+                page: pagination.pageIndex + 1,
+                per_page: pagination.pageSize,
+                sort_by: sorting[0]?.id,
+                sort_dir: sorting[0]?.desc ? 'desc' : 'asc',
+                search: search,
+            },
+        })
             .then((res) => {
                 const { data, meta } = res.data;
                 setData(data);

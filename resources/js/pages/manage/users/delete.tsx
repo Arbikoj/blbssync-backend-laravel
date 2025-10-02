@@ -10,7 +10,7 @@ import {
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import axios from 'axios';
+import api from '@/lib/api';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
@@ -25,8 +25,7 @@ export const DeleteDialog: React.FC<DeleteDialogProps> = ({ userId, userName, on
 
     const handleConfirmDelete = () => {
         setLoading(true);
-        axios
-            .delete(`/api/users/${userId}`)
+        api.delete(`/users/${userId}`)
             .then(() => onDeleted())
             .catch((err) => console.error('Gagal hapus user:', err))
             .finally(() => setLoading(false));

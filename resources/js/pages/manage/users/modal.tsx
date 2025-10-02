@@ -3,8 +3,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { UserFormData } from '@/interface/User';
+import api from '@/lib/api';
 import { useForm } from '@inertiajs/react';
-import axios from 'axios';
 import { useEffect } from 'react';
 
 type ModalUserProps = {
@@ -53,9 +53,9 @@ export default function ModalUser({ open, onOpenChange, mode, initialData, onSuc
 
         try {
             if (mode === 'add') {
-                await axios.post('/api/users', payload);
+                await api.post('/users', payload);
             } else {
-                await axios.put(`/api/users/${initialData?.id}`, payload);
+                await api.put(`/users/${initialData?.id}`, payload);
             }
 
             if (onSuccess) onSuccess();
