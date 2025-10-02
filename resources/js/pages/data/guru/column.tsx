@@ -23,4 +23,9 @@ export const columns: ColumnDef<Teacher>[] = [
         header: 'Kode',
         enableSorting: true,
     },
+    {
+        accessorKey: 'rfid_card.uid',
+        header: 'Rfid',
+        enableSorting: true,
+    },
 ];
