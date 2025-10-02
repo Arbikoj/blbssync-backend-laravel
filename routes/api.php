@@ -28,6 +28,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('/groups', GroupController::class);
     Route::apiResource('/subjects', SubjectController::class);
     Route::apiResource('/lessons', LessonController::class);
+    Route::apiResource('/schedules', ScheduleController::class);
+
+    Route::apiResource('/users', UserController::class);
 
     Route::apiResource('/attendances', AttendanceController::class);
     Route::apiResource('/rfidcards', RfidCardController::class);
@@ -41,8 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/users', [UserController::class, 'store']);
 
-Route::apiResource('/users', UserController::class);
-Route::apiResource('/schedules', ScheduleController::class);
+
 
 Route::post('/attendances/devices', [AttendanceController::class, 'devices']);
 
