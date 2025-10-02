@@ -73,6 +73,10 @@ const dropdownNav: DropdownItem[] = [
                 title: 'Rfid Cards',
                 url: '/manage/rfids',
             },
+            {
+                title: 'Devices',
+                url: '/manage/devices',
+            },
         ],
     },
     {

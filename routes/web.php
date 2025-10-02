@@ -47,6 +47,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('manage/rfids/page');
     })->name('rfid.index');
 
+    Route::get('/manage/devices', function(){
+        return Inertia::render('manage/devices/page');
+    })->name('device.index');
+
     Route::get('/absensi', function(){
         return Inertia::render('absensi/page');
     })->name('absensi.index');
