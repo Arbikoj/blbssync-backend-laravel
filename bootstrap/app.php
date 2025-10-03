@@ -9,6 +9,8 @@ use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Auth\AuthenticationException;
+use App\Models\Device;
+use Carbon\Carbon;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -46,4 +48,19 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 401);
             }
         });
-    })->create();
+    })
+    ->booted(function (Application $app) {
+        // Cek device offline saat bootstrap
+        $threshold = Carbon::now()->subMinutes(1); // device tidak update dalam 1 menit dianggap offline
+
+        $offlineDevices = Device::where('is_active', true)
+            ->where('updated_at', '<', $threshold)
+            ->get();
+
+        foreach ($offlineDevices as $device) {
+            $device->is_active = false;
+            $device->save();
+            logger()->info("Device {$device->device_id} set offline by bootstrap check");
+        }
+    })
+    ->create();

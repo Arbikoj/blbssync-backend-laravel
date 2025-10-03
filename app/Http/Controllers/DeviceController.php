@@ -129,4 +129,86 @@ class DeviceController extends Controller
 
         return new DataResource(true, 'Device Deleted Successfully', null);
     }
+
+    public function scanDeviceByCode($device_code)
+    {
+        $device = Device::where('device_id', $device_code)->first();
+
+        if (!$device || !$device->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device tidak ditemukan atau offline',
+            ], 404);
+        }
+
+        // Trigger MQTT publish ke alat (topik blbssync/{device_id}/scan)
+        $payload = [
+            'device_id' => $device->device_id,
+            'action'    => 'scan', // optional
+        ];
+
+        // Contoh publish MQTT (pakai php-mqtt/client atau laravel queue)
+        // $mqtt->publish("blbssync/{$device->device_id}/scan", json_encode($payload), 0);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Scan perintah dikirim ke device',
+            'data' => [
+                'device_id' => $device->device_id,
+            ],
+        ]);
+    }
+
+    public function scanResult(Request $request)
+    {
+        $data = $request->validate([
+            'device_id' => 'required|string|exists:devices,device_id',
+            'uid'       => 'required|string',
+        ]);
+
+        // Simpan sementara atau proses sesuai kebutuhan
+        // Misal simpan di cache supaya frontend modal bisa ambil
+        cache()->put('scan_result:' . $data['device_id'], $data['uid'], 60); // berlaku 60 detik
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Scan result recorded',
+            'data' => $data,
+        ]);
+    }
+    public function latestScan($device_code)
+    {
+        // Ambil UID hasil scan dari cache (yang disimpan worker Go di /devices/scan-result)
+        $uid = cache()->get('scan_result:' . $device_code);
+
+        return response()->json([
+            'success' => true,
+            'uid' => $uid ?? null,
+        ]);
+    }
+
+    public function updateStatus(Request $request, $device_code)
+    {
+        $device = Device::where('device_id', $device_code)->first();
+
+        $data = $request->validate([
+            'is_active' => 'required|boolean',
+        ]);
+
+        // $device->is_active = $data['is_active'];
+        $device->is_active = $request->boolean('is_active'); // otomatis true/false
+        $device->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status device diperbarui',
+            'data' => [
+                'device_id' => $device->device_id,
+                'bio'       => $device->bio,
+                'is_active' => $device->is_active,
+            ],
+        ]);
+    }
+
+
 }

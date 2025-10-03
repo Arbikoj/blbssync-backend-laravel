@@ -10,6 +10,7 @@ import { DataTable } from '../../../components/tanstack-table';
 import { columns as baseColumns } from './column';
 import { DeleteDeviceDialog } from './delete';
 import ModalDevice from './modal';
+import { ScanDeviceDialog } from './modalScan';
 
 type DeviceFormData = {
     id?: number;
@@ -35,6 +36,9 @@ const PageDevices = () => {
 
     const [sorting, setSorting] = useState<SortingState>([]);
     const [search, setSearch] = useState('');
+
+    const [scanModalOpen, setScanModalOpen] = useState(false);
+    const [scanningDevice, setScanningDevice] = useState<DeviceFormData | null>(null);
 
     const fetchData = () => {
         setLoading(true);
@@ -72,6 +76,11 @@ const PageDevices = () => {
         setModalOpen(true);
     };
 
+    const handleScan = (device: DeviceFormData) => {
+        setScanningDevice(device);
+        setScanModalOpen(true);
+    };
+
     const columns = [
         ...baseColumns,
         {
@@ -83,6 +92,7 @@ const PageDevices = () => {
                         <Pencil className="h-4 w-4" />
                     </Button>
                     <DeleteDeviceDialog deviceId={row.original.id} deviceCode={row.original.device_id} onDeleted={fetchData} />
+                    <ScanDeviceDialog deviceCode={row.original.device_id} />
                 </div>
             ),
         },

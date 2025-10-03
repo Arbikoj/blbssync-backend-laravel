@@ -34,7 +34,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('/attendances', AttendanceController::class);
     Route::apiResource('/rfidcards', RfidCardController::class);
-    Route::apiResource('/devices', DeviceController::class);
 
 
     Route::get('/teachers/scheduled/{scheduleId}', [TeacherController::class, 'getTeacherScheduledToday']);
@@ -47,4 +46,10 @@ Route::post('/users', [UserController::class, 'store']);
 
 
 Route::post('/attendances/devices', [AttendanceController::class, 'devices']);
+
+Route::post('/devices/{device_code}/scan', [DeviceController::class, 'scanDeviceByCode']);
+Route::post('/devices/scan-result', [DeviceController::class, 'scanResult']);
+Route::get('/devices/{device_code}/latest-scan', [DeviceController::class, 'latestScan']);
+Route::post('/devices/{device_code}/status', [DeviceController::class, 'updateStatus']);
+Route::apiResource('/devices', DeviceController::class);
 
