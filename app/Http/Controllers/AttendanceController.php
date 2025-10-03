@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendance;
 use App\Models\Teacher;
+use App\Models\RfidCard;
+use App\Models\Device;
 use Illuminate\Http\Request;
 use App\Http\Resources\DataResource;
 use Illuminate\Support\Facades\Validator;
@@ -145,20 +147,42 @@ class AttendanceController extends Controller
     public function devices(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'teacher_id'    => 'required|exists:teachers,id',
-            'user_type'     => 'required|string|in:teacher,student',
+            'device_id' => 'required|string|exists:devices,device_id',
+            'uid'       => 'required|string|exists:rfid_cards,uid',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => $validator->errors()], 422);
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()
+            ], 422);
         }
+
+        $rfidCard = RfidCard::with('teacher')->where('uid', $request->uid)->first();
+        $devices = Device::where('device_id', $request->device_id)->first();
+
+        if (!$rfidCard || !$rfidCard->teacher) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kartu RFID belum terhubung dengan guru.'
+            ], 422);
+        }
+
+        if (!$devices) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Device tidak ditemukan.'
+            ], 422);
+        }
+
+        $teacherId = $rfidCard->teacher_id;
 
         $hariIni = \Carbon\Carbon::now()->locale('id')->dayName;
         $now     = \Carbon\Carbon::now()->format('H:i:s');
 
         $schedule = \App\Models\Schedule::with('lesson')
             ->where('day', $hariIni)
-            ->where('teacher_id', $request->teacher_id)
+            ->where('teacher_id', $teacherId)
             ->whereHas('lesson', function ($q) use ($now) {
                 $q->where('start_hour', '<=', $now)
                 ->where('end_hour', '>=', $now);
@@ -181,7 +205,7 @@ class AttendanceController extends Controller
 
         // Cek apakah guru sudah ada absensi hari ini untuk jadwal ini
         $attendance = Attendance::where('schedule_id', $schedule->id)
-            ->where('teacher_id', $request->teacher_id)
+            ->where('teacher_id', $teacherId)
             ->whereDate('check_in', now()->toDateString())
             ->first();
 
@@ -220,8 +244,8 @@ class AttendanceController extends Controller
         // Jika belum ada absensi → buat baru (check-in)
         $attendance = Attendance::create([
             'schedule_id' => $schedule->id,
-            'teacher_id'  => $request->teacher_id,
-            'user_type'   => $request->user_type,
+            'teacher_id'  => $teacherId,
+            'user_type'   => "teacher",
             'check_in'    => now(),
             'status'      => $status,
         ]);
