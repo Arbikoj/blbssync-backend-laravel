@@ -17,12 +17,14 @@ class DataResource extends JsonResource
     public $status;
     public $message;
     public $resource;
+    public $notif;
 
-    public function __construct($status, $message, $resource)
+    public function __construct($status, $message, $resource, $notif = null)
     {
         parent::__construct($resource);
         $this->status  = $status;
         $this->message = $message;
+        $this->notif   = $notif;
     }
 
     public function toArray(Request $request): array
@@ -44,7 +46,8 @@ class DataResource extends JsonResource
         return [
             'success' => $this->status,
             'message' => $this->message,
-            'data'    => $this->resource
+            'data'    => $this->resource,
+            'notif'    => $this->notif
         ];
     }
 }

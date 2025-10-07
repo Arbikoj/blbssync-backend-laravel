@@ -164,14 +164,22 @@ class AttendanceController extends Controller
         if (!$rfidCard || !$rfidCard->teacher) {
             return response()->json([
                 'success' => false,
-                'message' => 'Kartu RFID belum terhubung dengan guru.'
+                'message' => 'Kartu RFID belum terhubung dengan guru.',
+                'notif'   => [
+                    'name' => null,
+                    'text' => 'Tidak Terdaftar'
+                ]
             ], 422);
         }
 
         if (!$devices) {
             return response()->json([
                 'success' => false,
-                'message' => 'Device tidak ditemukan.'
+                'message' => 'Device tidak ditemukan.',
+                'notif'   => [
+                    'name' => $rfidCard->teacher->name,
+                    'text' => 'Alat Tidak Valid'
+                ]
             ], 422);
         }
 
@@ -192,7 +200,11 @@ class AttendanceController extends Controller
         if (!$schedule) {
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak ada jadwal guru yang aktif pada jam ini.'
+                'message' => 'Tidak ada jadwal guru yang aktif pada jam ini.',
+                'notif'   => [
+                    'name' => $rfidCard->teacher->name,
+                    'text' => 'Tidak ada Jadwal'
+                ]
             ], 422);
         }
 
@@ -216,17 +228,33 @@ class AttendanceController extends Controller
                     $attendance->check_out = $timeNow;
                     $attendance->save();
 
-                    return new DataResource(true, 'Check-out berhasil', $attendance);
+                    return new DataResource(
+                        true, 
+                        'Check-out berhasil', 
+                        $attendance,
+                        [
+                            'name' => $rfidCard->teacher->name,
+                            'text' => 'Absen Pulang!'
+                        ]
+                    );
                 } else {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Belum bisa check-out, tunggu sampai 10 menit terakhir sebelum jam selesai.'
+                        'message' => 'Belum bisa check-out, tunggu sampai 10 menit terakhir sebelum jam selesai.',
+                        'notif'   => [
+                            'name' => $rfidCard->teacher->name,
+                            'text' => 'Belum Boleh!'
+                        ]
                     ], 422);
                 }
             } else {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Guru sudah menyelesaikan absensi hari ini untuk jadwal ini.'
+                    'message' => 'Guru sudah menyelesaikan absensi hari ini untuk jadwal ini.',
+                    'notif'   => [
+                        'name' => $rfidCard->teacher->name,
+                        'text' => 'Sudah Absen!'
+                    ]
                 ], 422);
             }
         }
@@ -250,6 +278,14 @@ class AttendanceController extends Controller
             'status'      => $status,
         ]);
 
-        return new DataResource(true, 'Check-in berhasil', $attendance);
+        return new DataResource(
+            true, 
+            'Check-in berhasil', 
+            $attendance,
+            [
+                'name' => $rfidCard->teacher->name,
+                'text' => 'Absen Masuk!'
+            ]
+        );
     }
 }
